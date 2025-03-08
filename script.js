@@ -1,24 +1,23 @@
 const setUpArray = (colAmt, rowAmt, n) => {
-    document.getElementById("grid").innerHTML = "";
-    document.getElementById("status").src = "./assets/standard.png";
+    document.getElementById("grid").innerHTML = ""; //reset grid
+    document.getElementById("status").src = "./assets/standard.png"; //reset status
     document.getElementById("grid").style.setProperty("grid-template-columns", `repeat(${colAmt}, 2rem)`);
 
     let field = [];
     let bombs = [];
 
+    // allows user to select a tile
     const setLeftClick = (e) => { 
         let element = e.target;
 
         if (element.nodeName != "BUTTON") {
-            element = element.parentNode;
+            element = element.parentNode; // if there is an image (a user note) over the tile then element will be that image, its parent will be the button
         }
 
-        console.log(`row: ${element.getAttribute("row")} col: ${element.getAttribute("col")}`);
-        
         if (element.value == 0) {
-            revealValuesAround(element);   
+            revealValuesAround(element); // if the tile value is 0 reveal all other tiles in a 1 tile radius
         } else {
-            revealTile(element);
+            revealTile(element); // if the value is not 0 reveal the singular tile
         }
 
         // checking for win state
@@ -26,38 +25,43 @@ const setUpArray = (colAmt, rowAmt, n) => {
         field.forEach(row => {
             row.forEach(element => {
                 if (element.getAttribute("revealed") == "false" && element.value != -1) {
-                    allFound = false;
-                }
+                    allFound = false; // if one tile (that does not have a value of -1) has not been clicked on, then all bombs have not been discovered
+                } 
             });
         });
 
         if (allFound) {
-            document.getElementById("status").src = "./assets/win.png";
-            removeListeners();
+            document.getElementById("status").src = "./assets/win.png"; // user has won
+            removeListeners(); // tiles can no longer be selected
         }
     }
 
+    // allows user to make a note
     const setRightClick = (e) => {
         let element = e.target;
 
         if (element.nodeName != "BUTTON") {
-            element = element.parentNode;
+            element = element.parentNode; // if there is an image (a user note) over the tile then element will be that image, its parent will be the button
         }
 
-        let current = element.getAttribute("userInfo");
+        let current = element.getAttribute("userInfo"); // gets what the current note is
+
+        if (element.querySelector(".tile-img") != null) {
+            element.removeChild(element.querySelector(".tile-img")); // if an note has already been made, remove that note
+        }
 
         switch (current) {
             case "":
-                element.innerHTML = `<img src="./assets/flag.png" class="tile-img" alt="flag"></img>`
-                element.setAttribute("userInfo", "flag");
+                element.innerHTML += `<img src="./assets/flag.png" class="tile-img" alt="flag"></img>`
+                element.setAttribute("userInfo", "flag"); // the element now has a flag
                 break;
             case "flag":
-                element.innerHTML = `<p class="tile-img">?</p>`
-                element.setAttribute("userInfo", "question");
+                element.innerHTML += `<p class="tile-img">?</p>`
+                element.setAttribute("userInfo", "question"); // the element now has a ?
                 break;
             case "question":
-                element.innerHTML = `<p class="tile-img"></p>`
-                element.setAttribute("userInfo", "");
+                element.innerHTML += `<p class="tile-img"></p>`
+                element.setAttribute("userInfo", ""); // the element now has nothing
                 break;
             default:
                 break;
@@ -65,15 +69,17 @@ const setUpArray = (colAmt, rowAmt, n) => {
         e.preventDefault();
     }
 
+    // removes button functionality for the tiles
     const removeListeners = () => {
         field.forEach(row => {
             row.forEach(element => {
-                element.removeEventListener("click", setLeftClick);
-                element.removeEventListener("contextmenu", setRightClick);
+                element.removeEventListener("click", setLeftClick);  // removes left click operations
+                element.removeEventListener("contextmenu", setRightClick); // removes right click operations
             });
         });
     }
 
+    // show the value under a tile and enter lose state if the value is -1
     const revealTile = (tile) => {
         if (tile.value != 0 && tile.value != -1) {
             tile.innerHTML = `<p>${tile.value}</p>`;
@@ -85,25 +91,28 @@ const setUpArray = (colAmt, rowAmt, n) => {
         tile.style.border = "1px #8a8b92 solid";
 
         if (tile.value == -1) {
-            tile.style.background = "#ff0000";
+            tile.style.background = "#ff0000"; // change background to red
 
             document.querySelectorAll(".bombs").forEach(element => {
-                element.style.visibility = "visible"; 
+                element.style.display = "block"; // make the bombs visible
+                
+                if (element.parentNode.querySelector(".tile-img") != null) {
+                    element.parentNode.querySelector(".tile-img").style.display = "none"; // if the user has a note over a bomb, make the note not visible
+                }
             });
 
-            document.getElementById("status").src = "./assets/lose.png";
-            removeListeners();
+            document.getElementById("status").src = "./assets/lose.png"; // change status
+            removeListeners(); // remove eventlisteners from all tiles
         }
     }
 
+    // reveals all values within a 1 tile radius of a tile
     const revealValuesAround = (tile) => {
         let tileRow = Number(tile.getAttribute("row"));
         let tileCol = Number(tile.getAttribute("col"));
         
         let rowStart = (tileRow - 1 >= 0) ? tileRow - 1 : tileRow;
         let rowEnd = (tileRow + 1 < rowAmt) ? tileRow + 1 : tileRow;
-
-
         let colStart = (tileCol - 1 >= 0) ? tileCol - 1 : tileCol;
         let colEnd = (tileCol + 1 < colAmt) ? tileCol + 1 : tileCol;
 
@@ -111,7 +120,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
             for (let col = colStart; col <= colEnd; col++) {
                 if (field[row][col].getAttribute("revealed") == "false" && Number(field[row][col].value) == 0) {
                     revealTile(field[row][col]);
-                    revealValuesAround(field[row][col]);
+                    revealValuesAround(field[row][col]); // if a tile revealed also has a value of 0, reveal all tiles surrounding that tilea as well
                 } else {
                     revealTile(field[row][col]);
                 }
@@ -123,7 +132,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
         for (let row = 0; row < rowAmt; row++) {
             field[row] = [];
             for (let col = 0; col < colAmt; col++) {
-                let button = `<button id="${row}-${col}" row=${row} col=${col} userInfo="" revealed=false value=0 ><p class="blank">0</p></button>`;
+                let button = `<button id="${row}-${col}" row=${row} col=${col} userInfo="" revealed=false value=0></button>`;
                 document.getElementById(`grid`).insertAdjacentHTML("beforeend", button);
                 field[row][col] = document.getElementById(`${row}-${col}`);
 

@@ -63,7 +63,7 @@ button {
 }
 
 button .bombs {
-    visibility: hidden;
+    display: none;
 }  
 
 button p {
@@ -74,8 +74,4 @@ button img {
     height: 100%;
     width: 100%;
     object-fit: contain;
-}
-
-button .blank {
-    visibility: hidden;
 }
