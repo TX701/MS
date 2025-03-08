@@ -6,6 +6,88 @@ const setUpArray = (colAmt, rowAmt, n) => {
     let field = [];
     let bombs = [];
 
+    // puts the game into a lose state
+    const handleBombs = (tile) => {
+        tile.style.background = "#ff0000"; // change background to red
+
+        document.querySelectorAll(".bombs").forEach(element => {
+            element.style.display = "block"; // make the bombs visible
+            
+            if (element.parentNode.querySelector(".tile-img") != null) {
+                element.parentNode.querySelector(".tile-img").style.display = "none"; // if the user has a note over a bomb, make the note not visible
+            }
+        });
+
+        document.getElementById("status").src = "./assets/lose.png"; // change status
+        removeListeners(); // remove eventlisteners from all tiles
+    }
+
+    // show the value under a tile and enter lose state if the value is -1
+    const revealTile = (tile) => {
+        if (tile.value != 0 && tile.value != -1) {
+            tile.innerHTML = `<span>${tile.value}</span>`;
+        }
+        
+        tile.setAttribute("revealed", true);
+        tile.removeEventListener("click", setLeftClick);
+        tile.removeEventListener("contextmenu", setRightClick);
+        tile.style.border = "1px #8a8b92 solid";
+
+        switch (Number(tile.value)) {
+            case -1:
+                handleBombs(tile);
+                break;
+            case 1:
+                tile.style.color = "#0000ff";
+                break;
+            case 2:
+                tile.style.color = "#00a857";
+                break;
+            case 3:
+                tile.style.color = "#fb0b0b";
+                break;
+            case 4: 
+                tile.style.color = "#070781";
+                break;
+            case 5: 
+                tile.style.color = "#881818";
+                break;
+            case 6: 
+                tile.style.color = "#007676";
+                break;
+            case 7: 
+                tile.style.color = "#7b057b";
+                break;
+            case 8: 
+                tile.style.color = "#000";
+                break;
+            default:
+                break;
+        }
+    }
+
+    // reveals all values within a 1 tile radius of a tile
+    const revealValuesAround = (tile) => {
+        let tileRow = Number(tile.getAttribute("row"));
+        let tileCol = Number(tile.getAttribute("col"));
+        
+        let rowStart = (tileRow - 1 >= 0) ? tileRow - 1 : tileRow;
+        let rowEnd = (tileRow + 1 < rowAmt) ? tileRow + 1 : tileRow;
+        let colStart = (tileCol - 1 >= 0) ? tileCol - 1 : tileCol;
+        let colEnd = (tileCol + 1 < colAmt) ? tileCol + 1 : tileCol;
+
+        for (let row = rowStart; row <= rowEnd; row++) {
+            for (let col = colStart; col <= colEnd; col++) {
+                if (field[row][col].getAttribute("revealed") == "false" && Number(field[row][col].value) == 0) {
+                    revealTile(field[row][col]);
+                    revealValuesAround(field[row][col]); // if a tile revealed also has a value of 0, reveal all tiles surrounding that tilea as well
+                } else {
+                    revealTile(field[row][col]);
+                }
+            }
+        }
+    }
+
     // allows user to select a tile
     const setLeftClick = (e) => { 
         let element = e.target;
@@ -79,69 +161,21 @@ const setUpArray = (colAmt, rowAmt, n) => {
         });
     }
 
-    // show the value under a tile and enter lose state if the value is -1
-    const revealTile = (tile) => {
-        if (tile.value != 0 && tile.value != -1) {
-            tile.innerHTML = `<p>${tile.value}</p>`;
-        }
-        
-        tile.setAttribute("revealed", true);
-        tile.removeEventListener("click", setLeftClick);
-        tile.removeEventListener("contextmenu", setRightClick);
-        tile.style.border = "1px #8a8b92 solid";
-
-        if (tile.value == -1) {
-            tile.style.background = "#ff0000"; // change background to red
-
-            document.querySelectorAll(".bombs").forEach(element => {
-                element.style.display = "block"; // make the bombs visible
-                
-                if (element.parentNode.querySelector(".tile-img") != null) {
-                    element.parentNode.querySelector(".tile-img").style.display = "none"; // if the user has a note over a bomb, make the note not visible
-                }
-            });
-
-            document.getElementById("status").src = "./assets/lose.png"; // change status
-            removeListeners(); // remove eventlisteners from all tiles
-        }
-    }
-
-    // reveals all values within a 1 tile radius of a tile
-    const revealValuesAround = (tile) => {
-        let tileRow = Number(tile.getAttribute("row"));
-        let tileCol = Number(tile.getAttribute("col"));
-        
-        let rowStart = (tileRow - 1 >= 0) ? tileRow - 1 : tileRow;
-        let rowEnd = (tileRow + 1 < rowAmt) ? tileRow + 1 : tileRow;
-        let colStart = (tileCol - 1 >= 0) ? tileCol - 1 : tileCol;
-        let colEnd = (tileCol + 1 < colAmt) ? tileCol + 1 : tileCol;
-
-        for (let row = rowStart; row <= rowEnd; row++) {
-            for (let col = colStart; col <= colEnd; col++) {
-                if (field[row][col].getAttribute("revealed") == "false" && Number(field[row][col].value) == 0) {
-                    revealTile(field[row][col]);
-                    revealValuesAround(field[row][col]); // if a tile revealed also has a value of 0, reveal all tiles surrounding that tilea as well
-                } else {
-                    revealTile(field[row][col]);
-                }
-            }
-        }
-    }
-
+    // create a "2D" array depending on the desired row and column amount
     const createTiles = () => {
         for (let row = 0; row < rowAmt; row++) {
             field[row] = [];
             for (let col = 0; col < colAmt; col++) {
                 let button = `<button id="${row}-${col}" row=${row} col=${col} userInfo="" revealed=false value=0></button>`;
                 document.getElementById(`grid`).insertAdjacentHTML("beforeend", button);
-                field[row][col] = document.getElementById(`${row}-${col}`);
-
+                field[row][col] = document.getElementById(`${row}-${col}`); // each array element corresponds to one button on the grid
                 field[row][col].addEventListener("click", setLeftClick);
                 field[row][col].addEventListener("contextmenu", setRightClick);
             }
         }
     }
 
+    // places bombs randomly on the grid
     const setBombs = () => {
         while (n > 0) {
             let row = Math.floor(Math.random() * rowAmt);
@@ -156,6 +190,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
         }
     }
 
+    // for each tile touching a bomb tile, change its value to its current value + 1 
     const setValues = (tile) => {
         let row = Number(tile.getAttribute("row"));
         let col = Number(tile.getAttribute("col"));
@@ -169,7 +204,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
         for (let smallRow = rowStart; smallRow <= rowEnd; smallRow++) {
             for (let smallGrid = colStart; smallGrid <= colEnd; smallGrid++) {
                 if (Number(field[smallRow][smallGrid].value) != -1) {
-                    field[smallRow][smallGrid].value = Number(field[smallRow][smallGrid].value) + 1;
+                    field[smallRow][smallGrid].value = Number(field[smallRow][smallGrid].value) + 1; // + 1 to reflect if multiple bombs are touching a tile
                 }
             }
         }
@@ -181,8 +216,6 @@ const setUpArray = (colAmt, rowAmt, n) => {
     bombs.forEach(element => {
         setValues(element);
     });
-
-    console.log(field);
 }
 
 document.getElementById("beginner").addEventListener("click", () => {
