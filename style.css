@@ -1,0 +1,81 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 100vh;
+    width: 100vw;
+}
+
+#options {
+    display: flex;
+    justify-content: space-evenly;
+    width: 50%;
+}
+
+#options h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#options .game-mode {
+    margin-bottom: 1rem;
+}
+
+#options button {
+    border: 1px black solid;
+    height: 2rem;
+    width: 5rem;
+}
+
+#game-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#game-panel img {
+    height: 2rem;
+    width: 2rem;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(8, 2rem);
+    grid-auto-rows: 2rem;
+
+    gap: 0;
+}
+
+button {
+    aspect-ratio: 1;
+    object-fit: contain;
+    border: 3px #87888f outset;
+    border-top-color: #fff;
+    border-left-color: #fff;
+}
+
+button .bombs {
+    visibility: hidden;
+}  
+
+button p {
+    font-size: 1.5rem;
+}
+
+button img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+}
+
+button .blank {
+    visibility: hidden;
+}
