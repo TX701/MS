@@ -2,6 +2,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
     document.getElementById("grid").innerHTML = ""; //reset grid
     document.getElementById("status").src = "./assets/standard.png"; //reset status
     document.getElementById("grid").style.setProperty("grid-template-columns", `repeat(${colAmt}, 2rem)`);
+    document.getElementById("bomb-count").innerHTML = `0${n}`;
 
     let field = [];
     let bombs = [];
@@ -177,7 +178,8 @@ const setUpArray = (colAmt, rowAmt, n) => {
 
     // places bombs randomly on the grid
     const setBombs = () => {
-        while (n > 0) {
+        let amount = n;
+        while (amount > 0) {
             let row = Math.floor(Math.random() * rowAmt);
             let col = Math.floor(Math.random() * colAmt);
 
@@ -185,7 +187,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
                 field[row][col].value = -1;
                 field[row][col].innerHTML = `<img src="./assets/bomb.png" class="bombs" alt="bombs">`;
                 bombs.push(field[row][col]);
-                n--;
+                amount--;
             }
         }
     }
@@ -215,6 +217,10 @@ const setUpArray = (colAmt, rowAmt, n) => {
 
     bombs.forEach(element => {
         setValues(element);
+    });
+
+    document.getElementById("reset-button").addEventListener("click", () => {
+        setUpArray(colAmt, rowAmt, n); 
     });
 }
 

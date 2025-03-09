@@ -8,20 +8,21 @@
     <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-    <div id="container"> 
-        <div id="options">
-            <h1 id="beginner" class="game-mode">Beginner</h1>
-            <h1 id="intermediate" class="game-mode">Intermediate</h1>
-            <h1 id="expert" class="game-mode">Expert</h1>
-        </div>
-         
+    <div id="container">
         <div id="game-panel">
-            <div id="information-panel">
-                <id id="bombs"><h1 id="bomb-count"></h1></div>
-                <img id="status" src="./assets/standard.png" alt="">
-                <div class="timer"><h1 class="time"></h1></div>
+            <div id="options">
+                <h1 id="beginner" class="game-mode">Beginner</h1>
+                <h1 id="intermediate" class="game-mode">Intermediate</h1>
+                <h1 id="expert" class="game-mode">Expert</h1>
             </div>
-            <div id="grid"></div>
+            <div id="game-elements">
+                <div id="information-panel">
+                    <div id="bombs"><h1 id="bomb-count"></h1></div>
+                    <button id="reset-button"><img id="status" src="./assets/standard.png" alt=""></button>
+                    <div id="timer"><h1 id="time">000</h1></div>
+                </div>
+                <div id="grid"></div>
+            </div>
         </div>
     </div>
 </body>
