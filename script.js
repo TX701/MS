@@ -1,8 +1,10 @@
-const setUpArray = (colAmt, rowAmt, n) => {
+const setUpArray = (colAmt, rowAmt, n, start) => {
     document.getElementById("grid").innerHTML = ""; //reset grid
     document.getElementById("status").src = "./assets/standard.png"; //reset status
     document.getElementById("grid").style.setProperty("grid-template-columns", `repeat(${colAmt}, 2rem)`);
     document.getElementById("bomb-count").innerHTML = `0${n}`;
+
+    startTime();
 
     let field = [];
     let bombs = [];
@@ -21,6 +23,7 @@ const setUpArray = (colAmt, rowAmt, n) => {
 
         document.getElementById("status").src = "./assets/lose.png"; // change status
         removeListeners(); // remove eventlisteners from all tiles
+        stopTime();
     }
 
     // show the value under a tile and enter lose state if the value is -1
@@ -220,20 +223,51 @@ const setUpArray = (colAmt, rowAmt, n) => {
     });
 
     document.getElementById("reset-button").addEventListener("click", () => {
+        stopTime();
         setUpArray(colAmt, rowAmt, n); 
+    });
+
+    document.getElementById("beginner").addEventListener("click", () => {
+        stopTime();
+        setUpArray(8, 8, 10); 
+    });
+    
+    document.getElementById("intermediate").addEventListener("click", () => {
+        stopTime();
+        setUpArray(16, 16, 40); 
+    });
+    
+    document.getElementById("expert").addEventListener("click", () => {
+        stopTime();
+        setUpArray(30, 16, 99); 
     });
 }
 
-document.getElementById("beginner").addEventListener("click", () => {
-    setUpArray(8, 8, 10); 
-});
+let timer = "";
 
-document.getElementById("intermediate").addEventListener("click", () => {
-    setUpArray(16, 16, 40); 
-});
+const startTime = () => {
+    let start = Date.now();
 
-document.getElementById("expert").addEventListener("click", () => {
-    setUpArray(30, 16, 99); 
-});
+    timer = setInterval(() => {
+        let delta = Math.floor(( Date.now() - start ) / 1000);
+
+        switch (delta.toString().length) {
+            case 1:
+                document.getElementById("time").innerHTML = `00${delta}`;
+                break;
+            case 2:
+                document.getElementById("time").innerHTML = `0${delta}`;
+                break;
+            default:
+                document.getElementById("time").innerHTML = `${delta}`;
+                break;
+        }
+
+    }, 1000);
+}
+
+const stopTime = () => {
+    clearInterval(timer);
+}
 
 setUpArray(8, 8, 10); // website loads with a beginner game open
