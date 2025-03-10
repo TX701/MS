@@ -119,6 +119,7 @@ const setUpArray = (colAmt, rowAmt, n, start) => {
         if (allFound) {
             document.getElementById("status").src = "./assets/win.png"; // user has won
             removeListeners(); // tiles can no longer be selected
+            stopTime();
         }
     }
 
@@ -261,6 +262,10 @@ const startTime = () => {
             default:
                 document.getElementById("time").innerHTML = `${delta}`;
                 break;
+        }
+
+        if (998 < delta) {
+            stopTime();
         }
 
     }, 1000);
